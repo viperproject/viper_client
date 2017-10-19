@@ -53,7 +53,7 @@ if not Path(args.file).is_file():
 
 headers = {'Content-Type': 'application/json'}
 req = {'arg': args.verifier + ' ' + args.options + ' ' +
-       os.path.abspath(args.file)}
+       '"' + os.path.abspath(args.file) + '"'}
 
 r = requests.post("http://localhost:" + str(args.port) + "/verify",
                   data=json.dumps(req),
@@ -62,12 +62,19 @@ r = requests.post("http://localhost:" + str(args.port) + "/verify",
 
 print(r.text)
 
+#r = requests.get("http://localhost:" + str(args.port) + "/exit",
+#                 stream=True)
+
+#r = requests.get("http://localhost:" + str(args.port) + "/discard/" +
+#                 str(r.json()["id"]),
+#                 stream=True)
+
 r = requests.get("http://localhost:" + str(args.port) + "/verify/" +
                  str(r.json()["id"]),
                  stream=True)
 
 for line in r.iter_lines():
     if line:
-        print(json.dumps(json.loads(line), indent=4))
+        print(json.dumps(json.loads(line), indent=2))
 
 
