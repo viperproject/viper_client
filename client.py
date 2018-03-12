@@ -86,6 +86,4 @@ r = requests.get("http://localhost:" + str(args.port) + "/verify/" +
 
 for line in r.iter_lines():
     if line:
-        print(json.dumps(json.loads(line), indent=2))
-
-
+        print(json.dumps(json.loads(line.decode("utf-8")), indent=2))
