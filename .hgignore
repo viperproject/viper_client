@@ -3,3 +3,5 @@ syntax: glob
 .pyc
 .idea
 .DS_Store
+target
+tmp
