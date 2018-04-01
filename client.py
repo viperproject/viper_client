@@ -33,7 +33,7 @@ parser.add_argument(
 parser.add_argument(
     "-v", "--verifier",
     help="Specify which verification backend to use.",
-    choices=backends,
+    #choices=backends,
     default="silicon")
 
 parser.add_argument(
@@ -60,7 +60,16 @@ if parser.get_default("file") == args.file:
     print("[viper_client] Testing ViperClient with an empty Viper file. Reason: no file is specified via option -f.")
 
 if parser.get_default("options") == args.options:
-    print("[viper_client] Default backend options set to: \n   " + args.options + "\n   (Override with -x)")
+    if args.verifier != "carbon":
+        print("[viper_client] Default backend options set to: \n   " + args.options +
+              "\n   (Override with -x)")
+    else:
+        default_carbon_options=( "  --boogieExe=/usr/local/Viper/boogie/Binaries/Boogie" if platform.system()=="Darwin" else
+                                 " '--boogieExe=C:\\Program Files\\Viper\\boogie\\Binaries\\Boogie.exe'")
+        print("[viper_client] Default backend options (for carbon) set to: \n" +
+              "[viper_client]   " + args.options + default_carbon_options + "\n" +
+              "[viper_client]   (Override with -x)")
+        args.options += default_carbon_options
 
 headers = {'Content-Type': 'application/json'}
 req = {'arg': args.verifier + ' ' + args.options + ' ' +
