@@ -33,7 +33,7 @@ parser.add_argument(
 parser.add_argument(
     "-v", "--verifier",
     help="Specify which verification backend to use.",
-    #choices=backends,
+    #choices=backends, -- we might need to use custom backends
     default="silicon")
 
 parser.add_argument(
@@ -53,14 +53,17 @@ if not Path(args.file).is_file():
     print("File `" + args.file + "` does not exist.")
     sys.exit(1)
 
-if parser.get_default("verifier") == args.verifier:
-    print("[viper_client] Using default verification backend (Silicon). Reason: option -v is not provided.")
+if args.verifier is None:
+    print("[viper_client] Using default verification backend (silicon). Reason: option -v is not provided.")
+    verification_backend = "silicon"
+else:
+    verification_backend = args.verifier
 
 if parser.get_default("file") == args.file:
     print("[viper_client] Testing ViperClient with an empty Viper file. Reason: no file is specified via option -f.")
 
 if parser.get_default("options") == args.options:
-    if args.verifier != "carbon":
+    if verification_backend != "carbon":
         print("[viper_client] Default backend options set to: \n   " + args.options +
               "\n   (Override with -x)")
     else:
@@ -72,7 +75,7 @@ if parser.get_default("options") == args.options:
         args.options += default_carbon_options
 
 headers = {'Content-Type': 'application/json'}
-req = {'arg': args.verifier + ' ' + args.options + ' ' +
+req = {'arg': verification_backend + ' ' + args.options + ' ' +
        '"' + os.path.abspath(args.file) + '"'}
 
 r = requests.post("http://localhost:" + str(args.port) + "/verify",
