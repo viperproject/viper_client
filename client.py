@@ -34,7 +34,8 @@ parser.add_argument(
     "-v", "--verifier",
     help="Specify which verification backend to use.",
     #choices=backends, -- we might need to use custom backends
-    default="silicon")
+    #default="silicon"
+    )
 
 parser.add_argument(
     "-x", "--options",
