@@ -1,6 +1,6 @@
 # README #
 
-This client app written in Python3 demonstrates how Viper REAT API can be used for submitting verification tasks to the ViperServer and receiving the resulting stream of Json objects. 
+This client app written in Python3 demonstrates how Viper API can be used for submitting verification tasks to the ViperServer and receiving the resulting stream of Json objects. 
 
 ### What is this repository for? ###
 
