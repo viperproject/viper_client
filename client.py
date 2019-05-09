@@ -97,6 +97,12 @@ r = requests.get("http://localhost:" + str(args.port) + "/verify/" +
                  str(r.json()["id"]),
                  stream=True)
 
-for line in r.iter_lines():
-    if line:
-        print(json.dumps(json.loads(line.decode("utf-8")), indent=2))
+r.raise_for_status()
+
+#for line in r.iter_lines():
+#    if line:
+#        print(json.dumps(json.loads(line.decode("utf-8")), indent=2))
+
+for chunk in r.iter_content(chunk_size=8192):
+    if chunk: # filter out keep-alive new chunks
+        print(chunk)
