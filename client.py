@@ -105,4 +105,4 @@ r.raise_for_status()
 
 for chunk in r.iter_content(chunk_size=8192):
     if chunk: # filter out keep-alive new chunks
-        print(chunk)
+        print(chunk.decode("utf-8"))
