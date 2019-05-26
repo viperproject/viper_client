@@ -10,8 +10,15 @@ import platform
 
 backends = ["silicon", "carbon"]
 command = ["verify", "terminate"]
+printmode = ["format", "bulk"]
 
 parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "-j", "--format",
+    help="Choose between nicely-[format]ted Json output vs [bulk]-friendly.",
+    choices=printmode,
+    default="format")
 
 parser.add_argument(
     "-c", "--command",
@@ -99,10 +106,12 @@ r = requests.get("http://localhost:" + str(args.port) + "/verify/" +
 
 r.raise_for_status()
 
-#for line in r.iter_lines():
-#    if line:
-#        print(json.dumps(json.loads(line.decode("utf-8")), indent=2))
-
-for chunk in r.iter_content(chunk_size=8192):
-    if chunk: # filter out keep-alive new chunks
-        print(chunk.decode("utf-8"))
+if args.format == "format":
+    for line in r.iter_lines():
+        if line:
+            print(json.dumps(json.loads(line.decode("utf-8")), indent=2))
+else:
+    for chunk in r.iter_content(chunk_size=8192):
+        if chunk: # filter out keep-alive new chunks
+            print(chunk.decode("utf-8"), end='')
+    print('\n')
