@@ -109,7 +109,12 @@ r.raise_for_status()
 if args.format == "format":
     for line in r.iter_lines():
         if line:
-            print(json.dumps(json.loads(line.decode("utf-8")), indent=2))
+            json_data = json.loads(line.decode("utf-8"))
+            print(json.dumps(json_data, indent=2))
+            if "--writeTraceFile" in args.options:
+                if json_data["msg_type"] == "symbolic_execution_logger_report":
+                    with open("genericNodes.json", 'w') as f:
+                        f.write(json.dumps(json_data["msg_body"], indent=2))
 else:
     for chunk in r.iter_content(chunk_size=8192):
         if chunk: # filter out keep-alive new chunks
