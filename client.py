@@ -111,7 +111,7 @@ if args.format == "format":
         if line:
             json_data = json.loads(line.decode("utf-8"))
             print(json.dumps(json_data, indent=2))
-            if "--writeTraceFile" in args.options:
+            if "--writeLogFile" in args.options:
                 if json_data["msg_type"] == "symbolic_execution_logger_report":
                     with open("genericNodes.json", 'w') as f:
                         f.write(json.dumps(json_data["msg_body"], indent=2))
