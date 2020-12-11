@@ -113,7 +113,7 @@ INI = requests.post("http://localhost:" + str(args.port) + "/verify",
 #print(r.text)
 
 #ast_id = INI.json()["ast_id"]
-ver_id = INI.json()["ver_id"]
+ver_id = INI.json()["id"]
 
 #import time
 #time.sleep(3)
