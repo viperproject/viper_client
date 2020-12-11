@@ -82,41 +82,64 @@ if parser.get_default("options") == args.options:
               "[viper_client]   (Override with -x)")
         args.options += default_carbon_options
 
+
+def print_formatted_response(response):
+    if args.format == "format":
+        for line in response.iter_lines():
+            if line:
+                json_data = json.loads(line.decode("utf-8"))
+                print(json.dumps(json_data, indent=2))
+                if "--writeLogFile" in args.options:
+                    if json_data["msg_type"] == "symbolic_execution_logger_report":
+                        with open("genericNodes.json", 'w') as f:
+                            f.write(json.dumps(json_data["msg_body"], indent=2))
+    else:
+        for chunk in response.iter_content(chunk_size=8192):
+            if chunk: # filter out keep-alive new chunks
+                print(chunk.decode("utf-8"), end='')
+        print('\n')
+
+
+
 headers = {'Content-Type': 'application/json'}
 req = {'arg': verification_backend + ' ' + args.options + ' ' +
        '"' + os.path.abspath(args.file) + '"'}
 
-r = requests.post("http://localhost:" + str(args.port) + "/verify",
-                  data=json.dumps(req),
-                  headers=headers,
-                  timeout=5)
+INI = requests.post("http://localhost:" + str(args.port) + "/verify",
+                    data=json.dumps(req),
+                    headers=headers,
+                    timeout=5)
 
-print(r.text)
+#print(r.text)
 
-#r = requests.get("http://localhost:" + str(args.port) + "/exit",
-#                 stream=True)
+#ast_id = INI.json()["ast_id"]
+ver_id = INI.json()["ver_id"]
 
-#r = requests.get("http://localhost:" + str(args.port) + "/discard/" +
-#                 str(r.json()["id"]),
-#                 stream=True)
+#import time
+#time.sleep(3)
 
-r = requests.get("http://localhost:" + str(args.port) + "/verify/" +
-                 str(r.json()["id"]),
+print("[INI] Response to initial request:")
+print_formatted_response(INI)
+
+#print("[AST] Requesting to stream AST construction results:")
+#AST = requests.get("http://localhost:" + str(args.port) + "/ast/" +
+#                   str(ast_id),
+#                   stream=True)
+
+#print(AST)
+#print(AST.text)
+
+#print_formatted_response(AST)
+
+
+
+#exit(0)
+
+
+
+print("[VER] Requesting to stream verification results:")
+VER = requests.get("http://localhost:" + str(args.port) + "/verify/" +
+                 str(ver_id),
                  stream=True)
 
-r.raise_for_status()
-
-if args.format == "format":
-    for line in r.iter_lines():
-        if line:
-            json_data = json.loads(line.decode("utf-8"))
-            print(json.dumps(json_data, indent=2))
-            if "--writeLogFile" in args.options:
-                if json_data["msg_type"] == "symbolic_execution_logger_report":
-                    with open("genericNodes.json", 'w') as f:
-                        f.write(json.dumps(json_data["msg_body"], indent=2))
-else:
-    for chunk in r.iter_content(chunk_size=8192):
-        if chunk: # filter out keep-alive new chunks
-            print(chunk.decode("utf-8"), end='')
-    print('\n')
+print_formatted_response(VER)
