@@ -7,6 +7,8 @@ from pathlib import Path
 import requests
 import json
 import platform
+import time
+import traceback
 
 backends = ["silicon", "carbon"]
 command = ["verify", "terminate"]
@@ -87,12 +89,18 @@ def print_formatted_response(response):
     if args.format == "format":
         for line in response.iter_lines():
             if line:
-                json_data = json.loads(line.decode("utf-8"))
-                print(json.dumps(json_data, indent=2))
-                if "--writeLogFile" in args.options:
-                    if json_data["msg_type"] == "symbolic_execution_logger_report":
-                        with open("genericNodes.json", 'w') as f:
-                            f.write(json.dumps(json_data["msg_body"], indent=2))
+                jsonString = line.decode("utf-8")
+                try:
+                    json_data = json.loads(jsonString)
+                except Exception as e:
+                    print('decoding line "' + jsonString + '" has failed')
+                    traceback.print_exc()
+                else:
+                    print(json.dumps(json_data, indent=2))
+                    if "--writeLogFile" in args.options:
+                        if json_data["msg_type"] == "symbolic_execution_logger_report":
+                            with open("genericNodes.json", 'w') as f:
+                                f.write(json.dumps(json_data["msg_body"], indent=2))
     else:
         for chunk in response.iter_content(chunk_size=8192):
             if chunk: # filter out keep-alive new chunks
@@ -137,6 +145,7 @@ print_formatted_response(INI)
 
 
 
+time.sleep(10)
 print("[VER] Requesting to stream verification results:")
 VER = requests.get("http://localhost:" + str(args.port) + "/verify/" +
                  str(ver_id),
