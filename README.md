@@ -24,6 +24,17 @@ Use cases (list not exhaustive):
 * Start ViperServer by running ```sbt run``` (from the root directory of ViperServer). 
 * Usage: ```./client.py -p 50424 -f /Users/wi/eth/phd_proj/trclo/repo/trclo_mark.vpr -v silicon -x="--disableCaching"```
 
+### Can I use this tool to benchmark Viper? ###
+
+Yes:
+
+```bash
+python3 client.py -p 12345 \
+    --warmup-file log/viper_program/<test-name>/<some-small-file.vpr> \
+    --benchmark log/viper_program/<test-name>* \
+    --benchmark-report report.json
+```
+
 ### Who do I talk to? ###
 
 * Requests are welcome! Please send them to [Arshavir](mailto:ter-gabrielyan@inf.ethz.ch)
