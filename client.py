@@ -59,9 +59,9 @@ def create_argument_parser():
         help="Pass additional options string to the verifier.")
 
     parser.add_argument(
-        "--benchmark-report",
+        "--benchmark-report-dir",
         help="Where to put the benchmark report",
-        default="report.json",
+        default=".",
     )
 
     parser.add_argument(
@@ -124,27 +124,30 @@ def benchmark_verify(log_file, port, verifier, options, file):
 
 def benchmark(
         port, verifier, options, warmup_file, warmup_reps, files,
-        benchmark_reps, benchmark_report
+        benchmark_reps, benchmark_report_dir
     ):
     assert len(files) == len(set(files)), 'file names are not unique'
     report = {}
+    timestamp = time.time()
+    os.makedirs(benchmark_report_dir, exist_ok=True)
+    benchmark_report = os.path.join(benchmark_report_dir, f'report-{str(timestamp)}.json')
     with open(benchmark_report, 'w') as report_file:
         try:
             with open('benchmark.log', 'w') as log_file:
                 while warmup_reps > 0:
-                    time = benchmark_verify(log_file, port, verifier, options, warmup_file)
+                    duration = benchmark_verify(log_file, port, verifier, options, warmup_file)
                     warmup_reps -= 1
-                    print(f'warm-up iteration {warmup_reps} time: {time}ms')
+                    print(f'warm-up iteration {warmup_reps} time: {duration}ms')
                 for file in files:
                     print(f'benchmarking: {file}')
-                    times = []
+                    durations = []
                     reps = benchmark_reps
                     while reps > 0:
-                        time = benchmark_verify(log_file, port, verifier, options, file)
+                        duration = benchmark_verify(log_file, port, verifier, options, file)
                         reps -= 1
-                        print(f'  iteration {reps} time: {time}ms')
-                        times.append(time)
-                    report[file] = times
+                        print(f'  iteration {reps} time: {duration}ms')
+                        durations.append(duration)
+                    report[file] = durations
         finally:
             report_file.write(json.dumps(report, indent = 2))
 
@@ -244,7 +247,7 @@ def main():
             args.port, args.verifier, options,
             args.warmup_file, args.warmup_reps,
             args.benchmark, args.benchmark_reps,
-            args.benchmark_report
+            args.benchmark_report_dir
         )
     elif args.command == "terminate":
         terminate(args.port)
