@@ -129,22 +129,24 @@ def benchmark(
     assert len(files) == len(set(files)), 'file names are not unique'
     report = {}
     with open(benchmark_report, 'w') as report_file:
-        with open('benchmark.log', 'w') as log_file:
-            while warmup_reps > 0:
-                time = benchmark_verify(log_file, port, verifier, options, warmup_file)
-                warmup_reps -= 1
-                print(f'warm-up iteration {warmup_reps} time: {time}ms')
-            for file in files:
-                print(f'benchmarking: {file}')
-                times = []
-                reps = benchmark_reps
-                while reps > 0:
-                    time = benchmark_verify(log_file, port, verifier, options, file)
-                    reps -= 1
-                    print(f'  iteration {reps} time: {time}ms')
-                    times.append(time)
-                report[file] = times
-        report_file.write(json.dumps(report, indent = 2))
+        try:
+            with open('benchmark.log', 'w') as log_file:
+                while warmup_reps > 0:
+                    time = benchmark_verify(log_file, port, verifier, options, warmup_file)
+                    warmup_reps -= 1
+                    print(f'warm-up iteration {warmup_reps} time: {time}ms')
+                for file in files:
+                    print(f'benchmarking: {file}')
+                    times = []
+                    reps = benchmark_reps
+                    while reps > 0:
+                        time = benchmark_verify(log_file, port, verifier, options, file)
+                        reps -= 1
+                        print(f'  iteration {reps} time: {time}ms')
+                        times.append(time)
+                    report[file] = times
+        finally:
+            report_file.write(json.dumps(report, indent = 2))
 
 
 def terminate(port):
