@@ -28,7 +28,7 @@ Yes:
 python3 client.py -p 12345 \
     --warmup-file log/viper_program/<test-name>/<some-small-file.vpr> \
     --benchmark log/viper_program/<test-name>* \
-    --benchmark-report report.json
+    --benchmark-report report
 ```
 
 ### Who do I talk to? ###
